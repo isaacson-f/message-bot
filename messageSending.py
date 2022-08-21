@@ -4,24 +4,27 @@ import pandas as pd
 import clx.xms as sinch
 from datetime import date, datetime, timedelta
 import math
-import json
 import os
+from dotenv import load_dotenv, find_dotenv
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+absDIR = os.path.join(BASEDIR, '.env')
+
+load_dotenv(absDIR)
+
+api_key = os.environ["api-token"]
+print(api_key)
+secret = os.environ["secret-key"]
+print(secret)
+phone_number = os.environ["phone-number"]
+print(phone_number)
 
 duties = ['Door', 'Bar', 'Event Monitor', 'Setup', 'Cleanup']
 event_start_time = datetime(2022, 8, 12, 22)
 monitor_start_time = datetime(2022, 8, 12, 20, 30)
 setup_start_time = datetime(2022, 8, 12, 20)
 cleanup_start_time = datetime(2022, 8, 13, 9)
-
-file_path = os.getcwd() + '/SinchCredentials.json'
-print(file_path)
-file = open(file_path)
-
-data = json.load(file)
-
-for i in data['credentials']:
-    print(i)
-
 
 def time_to_end(start_time, length_of_event):
     minutes_length = 0
@@ -32,7 +35,7 @@ def time_to_end(start_time, length_of_event):
     return start_time, finish_time
 
 def sendDuties():
-    with open('Desktop/Book1.csv','r') as excel:
+    with open('Book1.csv','r') as excel:
         file = pd.read_csv(excel)
         duty_dict = {}
         print(len(file))
@@ -59,16 +62,16 @@ def sendSMS(name, number, message):
 	# enter all the details
 	# get app_key and app_secret by registering
 	# a app on sinchSMS
-    client = sinch.Client('', '')
+    client = sinch.Client(secret, api_key)
 
     try:
         batch_params = sinch.api.MtBatchTextSmsCreate()
-        batch_params.sender = ''
-        batch_params.recipients = ['19523530315']
+        batch_params.sender = phone_number
+        batch_params.recipients = ['9523530315']
         batch_params.body = 'Hello, ${name}!'
         batch_params.parameters = {
                 'name': {
-                    '19523530315': 'Ethan',
+                    '9523530315': 'Ethan',
                     'default': 'valued customer'
                 }
             }
@@ -78,6 +81,6 @@ def sendSMS(name, number, message):
     except Exception as ex:
         print('Error creating batch: %s' % str(ex))
 
-#if __name__ == "__main__":
-	#sendDuties()
+if __name__ == "__main__":
+	sendSMS('Ethan',9523530315, "hello")
 
